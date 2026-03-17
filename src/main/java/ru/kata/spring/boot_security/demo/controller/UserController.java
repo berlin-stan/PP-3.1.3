@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -45,6 +46,8 @@ public class UserController {
     @GetMapping("/admin/addUser")
     public String showAddForm(Model model) {
         model.addAttribute("user", new User());
+        List<String> allRoles = List.of("ROLE_USER", "ROLE_ADMIN");
+        model.addAttribute("allRoles", allRoles);
         return "user-form";
     }
 
@@ -55,7 +58,7 @@ public class UserController {
                            @RequestParam("email") String email,
                            @RequestParam("age") int age,
                            @RequestParam(value = "password", required = false) String password,
-                           @RequestParam("roles") List<String> roles) {
+                           @RequestParam(value = "roleIds", required = false) List<String> roles) {
 
         userService.saveOrUpdateUser(id, firstName, lastName, email, age, password, roles);
         return "redirect:/admin/users";
@@ -65,6 +68,8 @@ public class UserController {
     public String showEditForm(@RequestParam("id") Long id, Model model) {
         User user = userService.getUserById(id);
         model.addAttribute("user", user);
+        List<String> allRoles = List.of("ROLE_USER", "ROLE_ADMIN");
+        model.addAttribute("allRoles", allRoles);
         return "user-form";
     }
 

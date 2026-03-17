@@ -45,7 +45,9 @@
       <span th:each="role, stat : ${#authentication.authorities}"
             th:text="${role.authority.replace('ROLE_', '')} + (not ${stat.last} ? ' ' : '')"></span>
     </span>
-    <a th:href="@{/logout}" class="btn btn-secondary btn-sm">Logout</a>
+    <form th:action="@{/logout}" method="post" style="display: inline;">
+      <button type="submit" class="btn btn-secondary btn-sm">Logout</button>
+    </form>
   </div>
 </nav>
 
@@ -117,11 +119,21 @@
         </div>
 
         <div class="mb-4">
-          <label for="role" class="form-label">Role</label>
-          <select class="form-select" id="role" name="roles" multiple>
-            <option value="ROLE_USER" th:selected="${user.roles == null || #lists.contains(user.roles, 'ROLE_USER')}">USER</option>
-            <option value="ROLE_ADMIN" th:selected="${#lists.contains(user.roles, 'ROLE_ADMIN')}">ADMIN</option>
-          </select>
+          <label class="form-label">Role</label>
+          <div>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input"
+                     name="roleIds" value="ROLE_USER"
+                     th:checked="${user.roles != null && #lists.contains(user.roles, 'ROLE_USER')}" />
+              <label class="form-check-label">USER</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input"
+                     name="roleIds" value="ROLE_ADMIN"
+                     th:checked="${user.roles != null && #lists.contains(user.roles, 'ROLE_ADMIN')}" />
+              <label class="form-check-label">ADMIN</label>
+            </div>
+          </div>
         </div>
 
         <div class="text-center">

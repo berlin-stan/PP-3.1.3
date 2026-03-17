@@ -58,33 +58,61 @@ public class UserServiceImpl implements UserService {
     public void saveOrUpdateUser(Long id, String firstName, String lastName, String email,
                                  int age, String password, List<String> roles) {
         User user;
+
         if (id != null) {
+            // РЕДАКТИРОВАНИЕ существующего пользователя
             user = getUserById(id);
             if (user != null) {
                 user.setFirstName(firstName);
                 user.setLastName(lastName);
                 user.setEmail(email);
                 user.setAge(age);
+
+                // Обновляем пароль только если ввели новый
                 if (password != null && !password.isEmpty()) {
                     user.setPassword(passwordEncoder.encode(password));
                 }
+
+                // ВАЖНО: обновляем роли ТОЛЬКО если они были выбраны в форме
+                // (roles не равен null и не пустой)
+                if (roles != null && !roles.isEmpty()) {
+                    Set<Role> userRoles = new LinkedHashSet<>();
+                    for (String roleName : roles) {
+                        Role role = roleRepository.findByName(roleName);
+                        if (role != null) {
+                            userRoles.add(role);
+                        }
+                    }
+                    user.setRoles(userRoles);
+                }
+                // Если roles == null или пустой - роли НЕ МЕНЯЕМ, оставляем старые
+
             } else {
+                // Странная ситуация: id есть, но пользователь не найден
                 user = new User(firstName, lastName, email, age, passwordEncoder.encode(password));
+                setUserRoles(user, roles); // для нового пользователя всегда устанавливаем роли
             }
         } else {
+            // СОЗДАНИЕ нового пользователя
             user = new User(firstName, lastName, email, age, passwordEncoder.encode(password));
+            setUserRoles(user, roles); // для нового пользователя всегда устанавливаем роли
         }
 
+        userRepository.save(user);
+    }
+
+    // Вспомогательный метод для установки ролей (используется только для НОВЫХ пользователей)
+    private void setUserRoles(User user, List<String> roles) {
         Set<Role> userRoles = new LinkedHashSet<>();
-        for (String roleName : roles) {
-            Role role = roleRepository.findByName(roleName);
-            if (role != null) {
-                userRoles.add(role);
+        if (roles != null) {
+            for (String roleName : roles) {
+                Role role = roleRepository.findByName(roleName);
+                if (role != null) {
+                    userRoles.add(role);
+                }
             }
         }
         user.setRoles(userRoles);
-
-        userRepository.save(user);
     }
 
     @Transactional

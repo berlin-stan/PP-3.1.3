@@ -46,9 +46,9 @@
       <span th:each="role, stat : ${#authentication.authorities}"
             th:text="${role.authority.replace('ROLE_', '')} + (not ${stat.last} ? ' ' : '')"></span>
     </span>
-    <a th:href="@{/logout}" class="btn btn-secondary btn-sm">
-      Logout
-    </a>
+    <form th:action="@{/logout}" method="post" style="display: inline;">
+      <button type="submit" class="btn btn-secondary btn-sm">Logout</button>
+    </form>
   </div>
 </nav>
 
