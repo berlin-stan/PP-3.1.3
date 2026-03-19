@@ -7,90 +7,232 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
         }
-        .user-container {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 30px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+
+        /* Черная полоса сверху */
+        .top-bar {
+            background-color: #343a40;
+            color: white;
+            padding: 12px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
         }
-        .user-info {
-            margin: 20px 0;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
+
+        .top-bar .user-info {
+            font-size: 14px;
         }
-        .info-row {
-            margin: 10px 0;
-            padding: 10px;
+
+        .top-bar .user-info strong {
+            margin-right: 5px;
+        }
+
+        .top-bar .btn-logout {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Основной контейнер */
+        .main-container {
+            display: flex;
+            margin-top: 56px; /* высота черной полосы */
+            min-height: calc(100vh - 56px);
+        }
+
+        /* Левая колонка */
+        .sidebar-panel {
+            width: 250px;
+            background-color: white;
+            border-right: 1px solid #dee2e6;
+            padding-top: 30px;
+        }
+
+        .sidebar-panel .nav-item {
+            padding: 15px 25px;
+            font-size: 16px;
+            cursor: default;
+        }
+
+        .sidebar-panel .nav-item.active {
+            background-color: #0d6efd;
+            color: white;
+            font-weight: 500;
+        }
+
+        /* Правая часть */
+        .content-panel {
+            flex: 1;
+            padding: 30px 40px;
+            background-color: #f5f5f5;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 30px;
+        }
+
+        /* Контейнер для таблицы */
+        .table-wrapper {
+            background-color: white;
+            border: 1px solid #dee2e6;
+            border-radius: 0;
+        }
+
+        /* Заголовок About user */
+        .about-header {
+            background-color: #e9ecef;
+            padding: 15px 20px;
+            font-weight: 600;
+            color: #495057;
             border-bottom: 1px solid #dee2e6;
         }
-        .info-label {
-            font-weight: bold;
+
+        /* Контейнер для внутренней таблицы */
+        .inner-table-container {
+            padding: 25px;
+            background-color: white;
+        }
+
+        /* Внутренняя таблица */
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        /* Белая строка с заголовками */
+        .user-table thead tr {
+            background-color: white;
+        }
+
+        .user-table th {
+            text-align: left;
+            font-weight: 600;
             color: #495057;
+            padding: 12px 5px;
+            border-bottom: 2px solid #dee2e6;
+            font-size: 14px;
+        }
+
+        /* Серая строка со значениями */
+        .user-table tbody tr {
+            background-color: #e9ecef;
+        }
+
+        .user-table td {
+            padding: 12px 5px;
+            color: #212529;
+            font-size: 14px;
+        }
+
+        /* Убираем границы у ячеек */
+        .user-table th,
+        .user-table td {
+            border: none;
+        }
+
+        /* Добавляем только верхнюю границу для строки значений */
+        .user-table tbody tr {
+            border-top: 2px solid #dee2e6;
+        }
+
+        /* Кнопка возврата */
+        .btn-back {
+            margin-top: 35px;
+            background-color: #0d6efd;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+        }
+
+        .btn-back:hover {
+            background-color: #0b5ed7;
+            color: white;
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
-<!-- Top Black Bar -->
-<nav class="navbar navbar-dark bg-dark">
-    <div class="container-fluid">
-        <span class="navbar-text">
-            <strong th:text="${#authentication.name}">user@mail.com</strong> with roles:
-            <span th:each="role, stat : ${#authentication.authorities}"
-                  th:text="${role.authority.replace('ROLE_', '')} + (not ${stat.last} ? ' ' : '')"></span>
-        </span>
-        <form th:action="@{/logout}" method="post" style="display: inline;">
-            <button type="submit" class="btn btn-secondary btn-sm">Logout</button>
-        </form>
+<!-- Черная полоса сверху (только здесь) -->
+<div class="top-bar">
+    <div class="user-info">
+        <strong th:text="${#authentication.name}">admin@mail.com</strong>
+        <span>with roles:
+                <span th:each="role, stat : ${#authentication.authorities}"
+                      th:text="${role.authority.replace('ROLE_', '')} + (${stat.last} ? '' : ' ')"></span>
+            </span>
     </div>
-</nav>
+    <form th:action="@{/logout}" method="post" style="display: inline;">
+        <button type="submit" class="btn-logout">Logout</button>
+    </form>
+</div>
 
-<div class="container">
-    <div class="user-container">
-        <h1 class="text-center mb-4">User Information</h1>
+<div class="main-container">
+    <!-- Левая колонка -->
+    <div class="sidebar-panel">
+        <div class="nav-item active">User</div>
+    </div>
 
-        <div class="user-info" th:if="${user}">
-            <div class="info-row">
-                <span class="info-label">ID:</span>
-                <span class="float-end" th:text="${user.id}">1</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">First Name:</span>
-                <span class="float-end" th:text="${user.firstName}">John</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Last Name:</span>
-                <span class="float-end" th:text="${user.lastName}">Doe</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Age:</span>
-                <span class="float-end" th:text="${user.age}">30</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Email:</span>
-                <span class="float-end" th:text="${user.email}">user@mail.com</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Roles:</span>
-                <span class="float-end"
-                      th:each="role, iterStat : ${user.roles}"
-                      th:text="${role.name.replace('ROLE_', '')} + (${iterStat.last} ? '' : ' ')">
-                </span>
+    <!-- Правая часть -->
+    <div class="content-panel">
+        <div class="page-title">User information-page</div>
+
+        <!-- Таблица с About user -->
+        <div class="table-wrapper">
+            <div class="about-header">About user</div>
+            <div class="inner-table-container">
+                <table class="user-table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Age</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td th:text="${user.id}">155</td>
+                        <td th:text="${user.firstName}">Admin</td>
+                        <td th:text="${user.lastName}">Admin</td>
+                        <td th:text="${user.age}">35</td>
+                        <td th:text="${user.email}">admin@mail.com</td>
+                        <td>
+                                    <span th:each="role, iterStat : ${user.roles}"
+                                          th:text="${role.name.replace('ROLE_', '')} + (${iterStat.last} ? '' : ' ')">USER ADMIN</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <div class="text-center mt-4">
-            <a th:href="@{/admin}" class="btn btn-primary" th:if="${#authentication.authorities.contains('ROLE_ADMIN')}">
-                Go to Admin Panel
-            </a>
+        <!-- Кнопка возврата для админов -->
+        <div th:if="${#strings.contains(#authentication.authorities, 'ADMIN')}">
+            <a th:href="@{/admin}" class="btn-back">← Back to Admin Panel</a>
         </div>
     </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
